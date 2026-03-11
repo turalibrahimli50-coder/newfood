@@ -1,9 +1,11 @@
-const API_URL = "https://turalibrahimli50-coder.github.io/site1/Api.json";
+const API_URL = "./Api.json";
+
+// 1. Əvvəlcə köməkçi funksiyalar
 const formatDate = (dateStr) => dateStr.split("T")[0];
 
+// 2. Sonra card funksiyaları
 const createNewsCard = ({ image_url, author, title, published_at }, options = {}) => {
   const { bgColor = "", extraStyle = "", tagStyle = "" } = options;
-
   return `
     <div class="news-card" style="background-image:url(${image_url});">
       <div class="tag-badge" style="z-index:1; position:absolute; top:20px; right:30px; ${tagStyle}">
@@ -33,6 +35,7 @@ const createLatestCard = ({ image_url, author, title, published_at }) => `
     </div>
   </div>`;
 
+// 3. Sonra render funksiyaları
 const renderHeroGrid = (articles) => {
   const leftEl   = document.getElementById("leftNews");
   const rightEl  = document.getElementById("rightNews");
@@ -41,11 +44,9 @@ const renderHeroGrid = (articles) => {
   articles.slice(0, 2).forEach((item) => {
     leftEl.innerHTML += createNewsCard(item);
   });
-
   articles.slice(2, 4).forEach((item) => {
     rightEl.innerHTML += createNewsCard(item);
   });
-
   centerEl.innerHTML += createNewsCard(articles[0], { bgColor: "#F63C24" });
 };
 
@@ -56,15 +57,17 @@ const renderLatestPosts = (articles) => {
   });
 };
 
+// 4. Ən sonda init
 const init = async () => {
   try {
-    const res      = await fetch(API_URL);
-    const { articles } = await res.json();
-
+    const res = await fetch(API_URL);
+    const data = await res.json();
+    const articles = Array.isArray(data) ? data : data.articles;
+    if (!articles) return;
     renderHeroGrid(articles);
     renderLatestPosts(articles);
   } catch (err) {
-    console.error("News fetch failed:", err);
+    console.error("Xəta:", err);
   }
 };
 
